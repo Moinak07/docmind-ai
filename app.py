@@ -509,9 +509,13 @@ div[data-testid="stNotificationContentError"] {
 [data-testid="stSpinner"] p { color: #55557a !important; font-size: 0.83rem !important; }
 
 #MainMenu, footer { visibility: hidden; }
-header { background: transparent !important; }
-header [data-testid="stToolbar"] { visibility: hidden; }
-button[data-testid="collapsedControl"] { visibility: visible !important; }
+header { visibility: visible !important; background: transparent !important; }
+button[data-testid="collapsedControl"],
+button[kind="header"],
+[data-testid="stSidebarCollapsedControl"] {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
 
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
