@@ -1,0 +1,58 @@
+# Core Python & Notebook
+ipykernel
+
+# Data Science Libraries
+numpy==1.26.4
+pandas
+matplotlib
+seaborn
+plotly
+scikit-learn
+
+# Web Apps
+flask
+streamlit
+fastapi
+uvicorn
+
+# Utilities
+memory_profiler
+python-dotenv
+
+# NLP
+nltk
+
+# LangChain Core
+langchain==0.2.16
+langchain-community==0.2.16
+langchain-core==0.2.38
+langchain-text-splitters==0.2.2
+
+# LangChain Integrations
+langchain-huggingface==0.0.3
+langchain-groq==0.1.9
+
+# ADDED: Recommended for LangChain compatibility/tracing
+langsmith
+
+# Vector Databases & Embeddings
+faiss-cpu
+sentence-transformers
+
+# PDF & Document Processing
+pypdf
+pymupdf
+bs4
+beautifulsoup4
+
+# ADDED: Required internally by sentence-transformers/HuggingFace in many setups
+transformers
+torch
+
+# External Knowledge Sources
+wikipedia
+arxiv==1.4.8
+
+# LangServe
+langserve
+sse-starlette
