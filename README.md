@@ -139,43 +139,6 @@ EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 
 You can tune these values to improve retrieval quality.
 
-## Important GitHub Safety Notes
-
-The project uses `.gitignore` to avoid uploading private or generated files:
-
-```gitignore
-.env
-venv/
-data/
-__pycache__/
-*.pyc
-temp.pdf
-```
-
-Do not push:
-
-- API keys
-- `.env`
-- Uploaded PDFs
-- Chat history
-- Virtual environment folders
-
-## Deployment Notes
-
-When deploying to Streamlit Community Cloud or another platform:
-
-1. Push only the safe project files to GitHub.
-2. Add secrets through the deployment platform's secret manager.
-3. Do not upload `.env`.
-4. Make sure `requirements.txt` contains all required packages.
-
-For Streamlit Community Cloud, add secrets in the app settings:
-
-```toml
-GROQ_API_KEY = "your_groq_api_key_here"
-HF_TOKEN = "your_huggingface_token_here"
-```
-
 ## Limitations
 
 - Scanned image-only PDFs may not work unless OCR is added.
