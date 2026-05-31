@@ -508,7 +508,10 @@ div[data-testid="stNotificationContentError"] {
 
 [data-testid="stSpinner"] p { color: #55557a !important; font-size: 0.83rem !important; }
 
-#MainMenu, footer, header { visibility: hidden; }
+#MainMenu, footer { visibility: hidden; }
+header { background: transparent !important; }
+header [data-testid="stToolbar"] { visibility: hidden; }
+button[data-testid="collapsedControl"] { visibility: visible !important; }
 
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
