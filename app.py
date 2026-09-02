@@ -1,6 +1,6 @@
 import streamlit as st
 
-from fullrag import (
+from backend.rag_pipeline import (
     answer_upload_status_question,
     build_conversational_rag_chain,
     build_vectorstore,

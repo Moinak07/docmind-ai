@@ -4,3 +4,7 @@ data/
 __pycache__/
 *.pyc
 temp.pdf
+*-check.out.log
+*-check.err.log
+*-reinstall.out.log
+*-reinstall.err.log
