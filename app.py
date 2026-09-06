@@ -1,6 +1,7 @@
 import streamlit as st
 
 from backend.logging_config import get_logger
+from backend.citations import build_citation_block, is_insufficient_answer
 from backend.faiss_store import get_or_build_vectorstore
 from backend.rag_pipeline import (
     answer_upload_status_question,
@@ -825,18 +826,32 @@ if ask_clicked:
                 typing_placeholder.empty()
                 st.markdown("**DocMind:**")
                 streamed_chunks = []
+                # Captures the ACTUAL final Top-5 Documents the LLM was given,
+                # so citations are built from real metadata — not the FAISS-only
+                # debug chunks and never anything the model made up.
+                context_documents = []
 
                 def answer_stream():
                     for chunk in stream_rag_answer(
                         st.session_state.chain,
                         user_input.strip(),
                         session_id,
+                        context_sink=context_documents,
                     ):
                         streamed_chunks.append(chunk)
                         yield chunk
 
                 st.write_stream(answer_stream())
                 answer = "".join(streamed_chunks)
+
+                # Append verified, source-grounded citations AFTER streaming, so
+                # the live typing experience is unchanged. Skipped when the model
+                # reported the answer isn't in the documents.
+                if not is_insufficient_answer(answer):
+                    citation_block = build_citation_block(context_documents)
+                    if citation_block:
+                        st.markdown(citation_block)
+                        answer = f"{answer}{citation_block}"
 
             st.session_state.chat_history.append({"role": "assistant", "content": answer})
             save_histories(st.session_state.store)

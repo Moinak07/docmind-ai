@@ -162,16 +162,29 @@ class HybridRetriever:
         documents: list[Document],
         embeddings,
         cross_encoder_model: str = CROSS_ENCODER_MODEL,
+        vectorstore: FAISS | None = None,
     ) -> None:
         self.chunks = split_documents(documents)
         self.embeddings = embeddings
         self.cross_encoder_model = cross_encoder_model
         self._cross_encoder = None  # lazily loaded on first rerank
 
-        # Dense index. FAISS.from_documents stores the chunks in insertion order;
-        # we keep our own copy in the SAME order so a FAISS hit can be mapped
-        # back to a chunk index for fusion via content+metadata identity.
-        self.vectorstore = FAISS.from_documents(documents=self.chunks, embedding=embeddings)
+        # Dense index. Two ways in, same chunk set either way:
+        #   * vectorstore=None (default, e.g. eval harness): build a fresh FAISS
+        #     index from these chunks.
+        #   * vectorstore=<existing FAISS> (production): REUSE the already-built,
+        #     persistent index as the dense source so no embeddings are recomputed.
+        # In both cases the dense leg maps a FAISS hit back to a chunk index by
+        # content+metadata identity, so the injected index must have been built
+        # from the SAME documents (it is -- backend.retriever.build_vectorstore
+        # splits with the identical split_documents(), giving identical chunks).
+        if vectorstore is not None:
+            self.vectorstore = vectorstore
+        else:
+            # FAISS.from_documents stores the chunks in insertion order; we keep
+            # our own copy in the SAME order so a FAISS hit can be mapped back to
+            # a chunk index for fusion via content+metadata identity.
+            self.vectorstore = FAISS.from_documents(documents=self.chunks, embedding=embeddings)
         self._index_by_identity = {
             self._identity(chunk): position for position, chunk in enumerate(self.chunks)
         }
