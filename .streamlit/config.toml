@@ -1,0 +1,4 @@
+[server]
+# Avoid probing lazy Transformers modules while watching source files. Restart
+# Streamlit manually after edits while this setting is enabled.
+fileWatcherType = "none"

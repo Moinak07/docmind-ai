@@ -1,5 +1,7 @@
 import streamlit as st
 
+from backend.logging_config import get_logger
+from backend.faiss_store import get_or_build_vectorstore
 from backend.rag_pipeline import (
     answer_upload_status_question,
     build_conversational_rag_chain,
@@ -16,6 +18,8 @@ from backend.rag_pipeline import (
     save_uploaded_pdfs,
     stream_rag_answer,
 )
+
+logger = get_logger(__name__)
 
 # ── Page config ────────────────────────────────────────────────────────────────
 def history_to_chat_display(session_history):
@@ -525,6 +529,10 @@ button[kind="header"],
 """, unsafe_allow_html=True)
 
 # ── Session state init ─────────────────────────────────────────────────────────
+if "app_started_logged" not in st.session_state:
+    # Log the startup banner once per session, not on every Streamlit rerun.
+    logger.info("DOCMIND-AI started")
+    st.session_state.app_started_logged = True
 if "store" not in st.session_state:
     st.session_state.store = load_saved_histories()
 if "vectorstore" not in st.session_state:
@@ -606,19 +614,19 @@ with st.sidebar:
 
     st.markdown('<span class="sb-label">Documents</span>', unsafe_allow_html=True)
     uploaded_files = st.file_uploader(
-        "Drop PDFs here or browse",
-        type="pdf",
+        "Drop documents here or browse",
+        type=["pdf", "docx", "txt", "csv"],
         accept_multiple_files=True,
         label_visibility="visible",
     )
     if uploaded_files:
         newly_saved = save_uploaded_pdfs(uploaded_files)
         if newly_saved:
-            # FIX: invalidate vectorstore so it rebuilds with the new PDF included
+            # FIX: invalidate vectorstore so it rebuilds with the new document included
             st.session_state.vectorstore = None
             st.session_state.chain = None
             st.session_state.loaded_pdf_names = set()
-            st.toast(f"{len(newly_saved)} PDF(s) uploaded!", icon="✅")
+            st.toast(f"{len(newly_saved)} document(s) uploaded!", icon="✅")
 
     saved_pdfs = get_saved_pdf_names()
     if saved_pdfs:
@@ -687,33 +695,40 @@ if not api_key:
     """, unsafe_allow_html=True)
     st.stop()
 
-# ── Build / rebuild vectorstore only when PDFs change ────────────────────────
+# ── Build / rebuild vectorstore only when documents change ───────────────────
 current_pdf_names = set(get_saved_pdf_names())
 pdfs_changed = current_pdf_names != st.session_state.loaded_pdf_names
 
 if current_pdf_names and pdfs_changed:
     with st.spinner("Indexing your documents…"):
         try:
-            documents = load_documents_from_saved_pdfs()
-            st.session_state.vectorstore = build_vectorstore(documents)
+            # Persistent FAISS: reuse the on-disk index when the corpus and
+            # embedding model still match its manifest (no embeddings recomputed);
+            # otherwise rebuild and persist. The name-set guard above already
+            # keeps this from running on ordinary Streamlit reruns.
+            st.session_state.vectorstore, rebuilt = get_or_build_vectorstore()
             st.session_state.chain = build_conversational_rag_chain(
                 api_key,
                 st.session_state.vectorstore,
                 st.session_state.store,
             )
             st.session_state.loaded_pdf_names = current_pdf_names
-            st.success(f"✦  {get_saved_pdf_count()} PDF(s) indexed and ready.")
+            if rebuilt:
+                st.success(f"✦  {get_saved_pdf_count()} document(s) indexed and ready.")
+            else:
+                st.success(f"✦  Loaded saved index for {get_saved_pdf_count()} document(s).")
         except Exception as exc:
-            st.error(f"Failed to index PDFs: {exc}")
+            logger.error("Failed to index documents: %s", exc, exc_info=True)
+            st.error(f"Failed to index documents: {exc}")
             st.stop()
 
-# ── Guard: no PDFs ────────────────────────────────────────────────────────────
+# ── Guard: no documents ──────────────────────────────────────────────────────
 if not current_pdf_names:
     st.markdown("""
     <div class="empty-state">
         <div class="empty-icon">📂</div>
         <div class="empty-title">No documents uploaded</div>
-        <div class="empty-sub">Upload one or more PDFs from the sidebar to start a conversation.</div>
+        <div class="empty-sub">Upload one or more documents from the sidebar to start a conversation.</div>
     </div>
     """, unsafe_allow_html=True)
     st.stop()
@@ -826,6 +841,7 @@ if ask_clicked:
             st.session_state.chat_history.append({"role": "assistant", "content": answer})
             save_histories(st.session_state.store)
         except Exception as exc:
+            logger.error("Error while answering query: %s", exc, exc_info=True)
             st.session_state.chat_history.append(
                 {"role": "assistant", "content": f"⚠️ Something went wrong: {exc}"}
             )

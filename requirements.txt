@@ -21,6 +21,8 @@ python-dotenv
 
 # NLP
 nltk
+# Task 5: BM25 sparse retrieval leg for hybrid search (rank_bm25.BM25Okapi).
+rank_bm25==0.2.2
 
 # LangChain Core
 langchain==0.2.16
@@ -42,13 +44,16 @@ sentence-transformers
 # PDF & Document Processing
 pypdf
 pymupdf
+docx2txt
 cryptography>=3.1
 bs4
 beautifulsoup4
 
 # ADDED: Required internally by sentence-transformers/HuggingFace in many setups
 transformers
-torch
+# Pin to a Python 3.12-compatible official Windows CPU wheel.  An unpinned
+# install selected a build that failed to initialize c10.dll on this system.
+torch==2.6.0
 
 # External Knowledge Sources
 wikipedia

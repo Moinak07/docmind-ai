@@ -11,6 +11,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, Prom
 from langchain_core.runnables.history import RunnableWithMessageHistory
 
 from backend.generator import DEFAULT_MODEL, get_llm, stream_rag_answer
+from backend.logging_config import get_logger
 from backend.retriever import (
     RETRIEVER_K,
     build_vectorstore,
@@ -21,6 +22,8 @@ from backend.retriever import (
     load_documents_from_saved_pdfs,
     save_uploaded_pdfs,
 )
+
+logger = get_logger(__name__)
 
 DATA_DIR = Path("data")
 CHAT_HISTORY_FILE = DATA_DIR / "chat_histories.json"
@@ -68,12 +71,12 @@ def answer_upload_status_question(question: str) -> str | None:
     status_terms = ("did i", "have i", "already", "uploaded", "do you have", "can you see")
     if not any(term in normalized_question for term in status_terms):
         return None
-    pdf_names = get_saved_pdf_names()
-    if not pdf_names:
-        return "No PDF is currently saved in the app. Please upload a PDF from the sidebar."
-    if len(pdf_names) == 1:
-        return f"Yes, one PDF is uploaded and ready: {pdf_names[0]}."
-    return f"Yes, {len(pdf_names)} PDFs are uploaded and ready: {', '.join(pdf_names)}."
+    document_names = get_saved_pdf_names()
+    if not document_names:
+        return "No document is currently saved in the app. Please upload a document from the sidebar."
+    if len(document_names) == 1:
+        return f"Yes, one document is uploaded and ready: {document_names[0]}."
+    return f"Yes, {len(document_names)} documents are uploaded and ready: {', '.join(document_names)}."
 
 
 def build_conversational_rag_chain(
@@ -82,6 +85,7 @@ def build_conversational_rag_chain(
     histories: dict,
     model_name: str = DEFAULT_MODEL,
 ):
+    logger.info("Building conversational RAG chain")
     llm = get_llm(api_key, model_name)
     retriever = vectorstore.as_retriever(search_kwargs={"k": RETRIEVER_K})
 
