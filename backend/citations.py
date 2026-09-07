@@ -127,9 +127,16 @@ def build_citation_block(documents: list) -> str:
     """
     citations = build_citations(documents)
     if not citations:
-        logger.info("No citable metadata in the generation context")
+        logger.warning(
+            "No citable metadata in the generation context",
+            extra={"component": "Citations"},
+        )
         return ""
-    logger.info("Attached %d source citation(s)", len(citations))
+    logger.info(
+        "Citations attached successfully - Count: %d",
+        len(citations),
+        extra={"component": "Citations"},
+    )
     lines = "\n".join(f"- {citation}" for citation in citations)
     return f"\n\n**Sources**\n{lines}"
 

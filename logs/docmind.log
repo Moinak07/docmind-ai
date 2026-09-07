@@ -1,0 +1,177 @@
+[2026-09-06 22:48:12,871] [INFO] [Session: default_session] [App] - DOCMIND-AI started successfully
+[2026-09-06 22:48:12,872] [INFO] [Session: default_session] [Session] - User session initialized successfully
+[2026-09-06 22:49:17,624] [INFO] [Session: default_session] [Config] - API key configured successfully
+[2026-09-06 22:50:00,439] [INFO] [Session: User1_id] [Session] - User session initialized successfully
+[2026-09-06 22:51:01,895] [INFO] [Session: User1_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 22:51:01,901] [INFO] [Session: User1_id] [Indexer] - Indexing started
+[2026-09-06 22:51:06,775] [INFO] [Session: User1_id] [Indexer] - Indexing completed successfully - Time: 4.88s
+[2026-09-06 22:56:28,210] [INFO] [Session: User1_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 22:56:28,216] [INFO] [Session: User1_id] [Indexer] - Indexing started
+[2026-09-06 22:56:28,260] [INFO] [Session: User1_id] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-06 22:56:29,451] [INFO] [Session: User1_id] [Indexer] - Indexing completed successfully - Time: 1.24s
+[2026-09-06 22:56:29,493] [INFO] [Session: User1_id] [RAG] - Query received - Length: 80 chars
+[2026-09-06 22:56:38,552] [INFO] [Session: User1_id] [Retriever] - Retrieval completed successfully - Chunks: 5, Latency: 8957ms
+[2026-09-06 22:56:39,672] [INFO] [Session: User1_id] [Generator] - Answer generated successfully - Latency: 10.18s
+[2026-09-06 22:56:39,672] [INFO] [Session: User1_id] [Citations] - Citations attached successfully - Count: 5
+[2026-09-06 22:56:39,821] [INFO] [Session: User1_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 22:56:39,821] [INFO] [Session: User1_id] [Indexer] - Indexing started
+[2026-09-06 22:56:39,865] [INFO] [Session: User1_id] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-06 22:56:40,534] [INFO] [Session: User1_id] [Indexer] - Indexing completed successfully - Time: 0.70s
+[2026-09-06 23:02:16,289] [INFO] [Session: User1_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 23:02:16,297] [INFO] [Session: User1_id] [Indexer] - Indexing started
+[2026-09-06 23:02:16,330] [INFO] [Session: User1_id] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-06 23:02:17,501] [INFO] [Session: User1_id] [Indexer] - Indexing completed successfully - Time: 1.21s
+[2026-09-06 23:02:17,590] [INFO] [Session: User1_id] [RAG] - Query received - Length: 73 chars
+[2026-09-06 23:02:28,088] [INFO] [Session: User1_id] [Retriever] - Retrieval completed successfully - Chunks: 5, Latency: 10000ms
+[2026-09-06 23:02:28,772] [INFO] [Session: User1_id] [Generator] - Answer generated successfully - Latency: 11.18s
+[2026-09-06 23:02:28,933] [INFO] [Session: User1_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 23:02:28,933] [INFO] [Session: User1_id] [Indexer] - Indexing started
+[2026-09-06 23:02:28,956] [INFO] [Session: User1_id] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-06 23:02:29,652] [INFO] [Session: User1_id] [Indexer] - Indexing completed successfully - Time: 0.72s
+[2026-09-06 23:03:52,743] [INFO] [Session: User1_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 23:03:52,748] [INFO] [Session: User1_id] [Indexer] - Indexing started
+[2026-09-06 23:03:52,777] [INFO] [Session: User1_id] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-06 23:03:53,892] [INFO] [Session: User1_id] [Indexer] - Indexing completed successfully - Time: 1.15s
+[2026-09-06 23:03:53,959] [INFO] [Session: User1_id] [RAG] - Query received - Length: 49 chars
+[2026-09-06 23:04:03,822] [INFO] [Session: User1_id] [Retriever] - Retrieval completed successfully - Chunks: 5, Latency: 9198ms
+[2026-09-06 23:04:04,010] [ERROR] [Session: User1_id] [Generator] - Answer generation failed: RateLimitError
+[2026-09-06 23:04:04,220] [INFO] [Session: User1_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 23:04:04,236] [INFO] [Session: User1_id] [Indexer] - Indexing started
+[2026-09-06 23:04:04,266] [INFO] [Session: User1_id] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-06 23:04:05,258] [INFO] [Session: User1_id] [Indexer] - Indexing completed successfully - Time: 1.03s
+[2026-09-06 23:04:19,087] [INFO] [Session: User1_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 23:04:19,096] [INFO] [Session: User1_id] [Indexer] - Indexing started
+[2026-09-06 23:04:19,120] [INFO] [Session: User1_id] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-06 23:04:20,135] [INFO] [Session: User1_id] [Indexer] - Indexing completed successfully - Time: 1.04s
+[2026-09-06 23:04:20,200] [INFO] [Session: User1_id] [RAG] - Query received - Length: 49 chars
+[2026-09-06 23:04:20,507] [ERROR] [Session: User1_id] [Generator] - Answer generation failed: RateLimitError
+[2026-09-06 23:04:20,753] [INFO] [Session: User1_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 23:04:20,761] [INFO] [Session: User1_id] [Indexer] - Indexing started
+[2026-09-06 23:04:20,790] [INFO] [Session: User1_id] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-06 23:04:22,026] [INFO] [Session: User1_id] [Indexer] - Indexing completed successfully - Time: 1.26s
+[2026-09-06 23:05:06,894] [INFO] [Session: User1_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 23:05:06,899] [INFO] [Session: User1_id] [Indexer] - Indexing started
+[2026-09-06 23:05:06,933] [INFO] [Session: User1_id] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-06 23:05:08,089] [INFO] [Session: User1_id] [Indexer] - Indexing completed successfully - Time: 1.19s
+[2026-09-06 23:05:08,154] [INFO] [Session: User1_id] [RAG] - Query received - Length: 63 chars
+[2026-09-06 23:05:19,018] [INFO] [Session: User1_id] [Retriever] - Retrieval completed successfully - Chunks: 5, Latency: 9764ms
+[2026-09-06 23:05:19,200] [ERROR] [Session: User1_id] [Generator] - Answer generation failed: RateLimitError
+[2026-09-06 23:05:19,332] [INFO] [Session: User1_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 23:05:19,337] [INFO] [Session: User1_id] [Indexer] - Indexing started
+[2026-09-06 23:05:19,357] [INFO] [Session: User1_id] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-06 23:05:20,018] [INFO] [Session: User1_id] [Indexer] - Indexing completed successfully - Time: 0.68s
+[2026-09-06 23:05:45,847] [INFO] [Session: User1_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 23:05:45,847] [INFO] [Session: User1_id] [Indexer] - Indexing started
+[2026-09-06 23:05:45,879] [INFO] [Session: User1_id] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-06 23:05:45,967] [INFO] [Session: User1_id] [Config] - API key configured successfully
+[2026-09-06 23:05:45,972] [INFO] [Session: User1_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 23:05:45,977] [INFO] [Session: User1_id] [Indexer] - Indexing started
+[2026-09-06 23:05:46,012] [INFO] [Session: User1_id] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-06 23:05:48,157] [INFO] [Session: User1_id] [Indexer] - Indexing completed successfully - Time: 2.19s
+[2026-09-06 23:05:59,289] [INFO] [Session: User1_id] [Config] - API key configured successfully
+[2026-09-06 23:05:59,295] [INFO] [Session: User1_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 23:05:59,301] [INFO] [Session: User1_id] [Indexer] - Indexing started
+[2026-09-06 23:05:59,321] [INFO] [Session: User1_id] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-06 23:06:00,485] [INFO] [Session: User1_id] [Indexer] - Indexing completed successfully - Time: 1.19s
+[2026-09-06 23:06:20,331] [INFO] [Session: User1_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 23:06:20,346] [INFO] [Session: User1_id] [Indexer] - Indexing started
+[2026-09-06 23:06:20,372] [INFO] [Session: User1_id] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-06 23:06:20,407] [INFO] [Session: User2_id] [Session] - User session initialized successfully
+[2026-09-06 23:06:20,407] [INFO] [Session: User2_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 23:06:20,423] [INFO] [Session: User2_id] [Indexer] - Indexing started
+[2026-09-06 23:06:20,454] [INFO] [Session: User2_id] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-06 23:06:22,506] [INFO] [Session: User2_id] [Indexer] - Indexing completed successfully - Time: 2.08s
+[2026-09-06 23:07:02,573] [INFO] [Session: User2_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 23:07:02,574] [INFO] [Session: User2_id] [Upload] - 'AI Engineering Project Guide.pdf' uploaded successfully - Size: 47.3KB
+[2026-09-06 23:07:02,582] [INFO] [Session: User2_id] [Indexer] - Indexing started
+[2026-09-06 23:07:10,043] [INFO] [Session: User2_id] [Indexer] - Indexing completed successfully - Time: 7.46s
+[2026-09-06 23:09:14,309] [INFO] [Session: User2_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 23:09:14,310] [INFO] [Session: User2_id] [Upload] - 'AI Engineering Project Guide.pdf' uploaded successfully - Size: 47.3KB
+[2026-09-06 23:09:14,313] [INFO] [Session: User2_id] [Indexer] - Indexing started
+[2026-09-06 23:09:14,391] [INFO] [Session: User2_id] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-06 23:09:16,024] [INFO] [Session: User2_id] [Indexer] - Indexing completed successfully - Time: 1.71s
+[2026-09-06 23:09:16,087] [INFO] [Session: User2_id] [RAG] - Query received - Length: 119 chars
+[2026-09-06 23:09:27,688] [INFO] [Session: User2_id] [Retriever] - Retrieval completed successfully - Chunks: 5, Latency: 11515ms
+[2026-09-06 23:09:28,549] [INFO] [Session: User2_id] [Generator] - Answer generated successfully - Latency: 12.46s
+[2026-09-06 23:09:28,550] [INFO] [Session: User2_id] [Citations] - Citations attached successfully - Count: 4
+[2026-09-06 23:09:28,792] [INFO] [Session: User2_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 23:09:28,792] [INFO] [Session: User2_id] [Upload] - 'AI Engineering Project Guide.pdf' uploaded successfully - Size: 47.3KB
+[2026-09-06 23:09:28,792] [INFO] [Session: User2_id] [Indexer] - Indexing started
+[2026-09-06 23:09:28,832] [INFO] [Session: User2_id] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-06 23:09:30,112] [INFO] [Session: User2_id] [Indexer] - Indexing completed successfully - Time: 1.32s
+[2026-09-06 23:10:25,564] [INFO] [Session: User2_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 23:10:25,564] [INFO] [Session: User2_id] [Upload] - 'AI Engineering Project Guide.pdf' uploaded successfully - Size: 47.3KB
+[2026-09-06 23:10:25,569] [INFO] [Session: User2_id] [Indexer] - Indexing started
+[2026-09-06 23:10:25,607] [INFO] [Session: User2_id] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-06 23:10:26,858] [INFO] [Session: User2_id] [Indexer] - Indexing completed successfully - Time: 1.29s
+[2026-09-06 23:10:26,929] [INFO] [Session: User2_id] [RAG] - Query received - Length: 112 chars
+[2026-09-06 23:10:36,694] [INFO] [Session: User2_id] [Retriever] - Retrieval completed successfully - Chunks: 5, Latency: 9070ms
+[2026-09-06 23:10:37,246] [INFO] [Session: User2_id] [Generator] - Answer generated successfully - Latency: 10.32s
+[2026-09-06 23:10:37,246] [INFO] [Session: User2_id] [Citations] - Citations attached successfully - Count: 3
+[2026-09-06 23:10:37,467] [INFO] [Session: User2_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 23:10:37,467] [INFO] [Session: User2_id] [Upload] - 'AI Engineering Project Guide.pdf' uploaded successfully - Size: 47.3KB
+[2026-09-06 23:10:37,467] [INFO] [Session: User2_id] [Indexer] - Indexing started
+[2026-09-06 23:10:37,522] [INFO] [Session: User2_id] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-06 23:10:38,941] [INFO] [Session: User2_id] [Indexer] - Indexing completed successfully - Time: 1.46s
+[2026-09-06 23:11:18,733] [INFO] [Session: User2_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 23:11:18,734] [INFO] [Session: User2_id] [Upload] - 'AI Engineering Project Guide.pdf' uploaded successfully - Size: 47.3KB
+[2026-09-06 23:11:18,744] [INFO] [Session: User2_id] [Indexer] - Indexing started
+[2026-09-06 23:11:18,775] [INFO] [Session: User2_id] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-06 23:11:20,106] [INFO] [Session: User2_id] [Indexer] - Indexing completed successfully - Time: 1.37s
+[2026-09-06 23:11:20,164] [INFO] [Session: User2_id] [RAG] - Query received - Length: 92 chars
+[2026-09-06 23:11:32,589] [INFO] [Session: User2_id] [Retriever] - Retrieval completed successfully - Chunks: 5, Latency: 9704ms
+[2026-09-06 23:11:33,182] [INFO] [Session: User2_id] [Generator] - Answer generated successfully - Latency: 13.02s
+[2026-09-06 23:11:33,183] [INFO] [Session: User2_id] [Citations] - Citations attached successfully - Count: 4
+[2026-09-06 23:11:33,425] [INFO] [Session: User2_id] [Upload] - 'Principal Component Analysis _PCA_.pdf' uploaded successfully - Size: 2635.7KB
+[2026-09-06 23:11:33,427] [INFO] [Session: User2_id] [Upload] - 'AI Engineering Project Guide.pdf' uploaded successfully - Size: 47.3KB
+[2026-09-06 23:11:33,439] [INFO] [Session: User2_id] [Indexer] - Indexing started
+[2026-09-06 23:11:33,483] [INFO] [Session: User2_id] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-06 23:11:34,945] [INFO] [Session: User2_id] [Indexer] - Indexing completed successfully - Time: 1.50s
+[2026-09-07 12:32:02,853] [INFO] [Session: default_session] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-07 12:32:02,953] [INFO] [Session: default_session] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-07 12:32:03,018] [WARNING] [Session: default_session] [Indexer] - Persisted FAISS index could not be loaded; will rebuild
+[2026-09-07 12:32:03,018] [INFO] [Session: default_session] [Indexer] - Existing FAISS index loaded - corpus unchanged
+[2026-09-07 12:32:03,018] [WARNING] [Session: default_session] [Indexer] - Persisted FAISS index could not be loaded; will rebuild
+[2026-09-07 12:32:03,018] [WARNING] [Session: default_session] [Indexer] - Manifest matched but index missing/corrupt; rebuilding
+[2026-09-07 12:32:03,043] [WARNING] [Session: default_session] [Indexer] - FAISS manifest unreadable or invalid; will rebuild index
+[2026-09-07 12:32:03,049] [WARNING] [Session: default_session] [Indexer] - FAISS manifest unreadable or invalid; will rebuild index
+[2026-09-07 12:34:07,071] [INFO] [Session: default_session] [Upload] - 'PCA.pdf' uploaded successfully - Size: 0.0KB
+[2026-09-07 12:34:07,092] [INFO] [Session: default_session] [Upload] - 'own.txt' uploaded successfully - Size: 0.0KB
+[2026-09-07 12:36:48,742] [INFO] [Session: default_session] [App] - DOCMIND-AI started successfully
+[2026-09-07 12:36:48,742] [INFO] [Session: default_session] [Session] - User session initialized successfully
+[2026-09-07 12:38:04,087] [INFO] [Session: default_session] [Config] - API key configured successfully
+[2026-09-07 12:38:35,962] [INFO] [Session: PCA Notes] [Session] - User session initialized successfully
+[2026-09-07 12:41:38,514] [INFO] [Session: PCA Notes] [Upload] - 'Module 3.pdf' uploaded successfully - Size: 18386.9KB
+[2026-09-07 12:41:38,640] [INFO] [Session: PCA Notes] [Indexer] - Indexing started
+[2026-09-07 12:42:01,593] [INFO] [Session: PCA Notes] [Indexer] - Indexing completed successfully - Time: 22.96s
+[2026-09-07 12:45:18,690] [INFO] [Session: PCA Notes] [RAG] - Query received - Length: 95 chars
+[2026-09-07 12:45:30,951] [INFO] [Session: PCA Notes] [Retriever] - Retrieval completed successfully - Chunks: 5, Latency: 11800ms
+[2026-09-07 12:45:31,849] [INFO] [Session: PCA Notes] [Generator] - Answer generated successfully - Latency: 13.15s
+[2026-09-07 12:45:31,849] [INFO] [Session: PCA Notes] [Citations] - Citations attached successfully - Count: 4
+[2026-09-07 12:46:05,981] [INFO] [Session: PCA Notes] [RAG] - Query received - Length: 101 chars
+[2026-09-07 12:46:08,124] [INFO] [Session: PCA Notes] [Retriever] - Retrieval completed successfully - Chunks: 5, Latency: 1270ms
+[2026-09-07 12:46:08,831] [INFO] [Session: PCA Notes] [Generator] - Answer generated successfully - Latency: 2.85s
+[2026-09-07 12:46:08,831] [INFO] [Session: PCA Notes] [Citations] - Citations attached successfully - Count: 5
+[2026-09-07 12:46:34,064] [INFO] [Session: PCA Notes] [RAG] - Query received - Length: 80 chars
+[2026-09-07 12:46:36,511] [INFO] [Session: PCA Notes] [Retriever] - Retrieval completed successfully - Chunks: 5, Latency: 1661ms
+[2026-09-07 12:46:37,444] [INFO] [Session: PCA Notes] [Generator] - Answer generated successfully - Latency: 3.38s
+[2026-09-07 12:46:37,444] [INFO] [Session: PCA Notes] [Citations] - Citations attached successfully - Count: 5
+[2026-09-07 12:49:36,979] [INFO] [Session: clustering notes] [Session] - User session initialized successfully
+[2026-09-07 12:50:16,924] [INFO] [Session: clustering notes] [Upload] - 'IRIS.csv' uploaded successfully - Size: 4.5KB
+[2026-09-07 12:50:16,958] [INFO] [Session: clustering notes] [Indexer] - Indexing started
+[2026-09-07 12:50:20,612] [INFO] [Session: clustering notes] [Indexer] - Indexing completed successfully - Time: 3.65s
+[2026-09-07 12:51:09,553] [INFO] [Session: clustering notes] [RAG] - Query received - Length: 52 chars
+[2026-09-07 12:51:20,211] [INFO] [Session: clustering notes] [Retriever] - Retrieval completed successfully - Chunks: 5, Latency: 10411ms
+[2026-09-07 12:51:21,702] [INFO] [Session: clustering notes] [Generator] - Answer generated successfully - Latency: 12.15s
+[2026-09-07 12:51:21,705] [INFO] [Session: clustering notes] [Citations] - Citations attached successfully - Count: 5
+[2026-09-07 12:51:46,089] [INFO] [Session: clustering notes] [RAG] - Query received - Length: 100 chars
+[2026-09-07 12:51:50,166] [INFO] [Session: clustering notes] [Retriever] - Retrieval completed successfully - Chunks: 5, Latency: 2706ms
+[2026-09-07 12:51:51,925] [INFO] [Session: clustering notes] [Generator] - Answer generated successfully - Latency: 5.82s
+[2026-09-07 12:51:51,929] [INFO] [Session: clustering notes] [Citations] - Citations attached successfully - Count: 5
+[2026-09-07 12:52:17,403] [INFO] [Session: clustering notes] [RAG] - Query received - Length: 89 chars
+[2026-09-07 12:52:20,803] [INFO] [Session: clustering notes] [Retriever] - Retrieval completed successfully - Chunks: 5, Latency: 2573ms
+[2026-09-07 12:52:22,412] [INFO] [Session: clustering notes] [Generator] - Answer generated successfully - Latency: 5.01s
+[2026-09-07 12:52:22,414] [INFO] [Session: clustering notes] [Citations] - Citations attached successfully - Count: 5
+[2026-09-07 12:55:33,687] [INFO] [Session: clustering notes] [RAG] - Query received - Length: 101 chars
+[2026-09-07 12:55:38,140] [INFO] [Session: clustering notes] [Retriever] - Retrieval completed successfully - Chunks: 5, Latency: 3067ms
+[2026-09-07 12:55:38,704] [INFO] [Session: clustering notes] [Generator] - Answer generated successfully - Latency: 5.01s

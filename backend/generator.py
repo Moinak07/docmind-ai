@@ -1,6 +1,7 @@
 from langchain_groq import ChatGroq
+import time
 
-from backend.logging_config import get_logger
+from backend.logging_config import get_logger, set_session_id
 
 logger = get_logger(__name__)
 
@@ -9,7 +10,7 @@ DEFAULT_MODEL = "qwen/qwen3.8-27b"
 
 
 def get_llm(api_key: str, model_name: str = DEFAULT_MODEL) -> ChatGroq:
-    logger.info("Initializing LLM: %s", model_name)
+    logger.debug("Initializing LLM: %s", model_name, extra={"component": "Generator"})
     return ChatGroq(groq_api_key=api_key, model_name=model_name, streaming=True)
 
 
@@ -26,8 +27,14 @@ def stream_rag_answer(chain, question: str, session_id: str, context_sink=None):
     """
     # Log the query boundary and the LLM hand-off. Never log the full question
     # text, the retrieved context, or the conversation history.
-    logger.info("Processing query (length=%d chars)", len(question))
-    logger.info("Sending context to LLM")
+    set_session_id(session_id)
+    logger.info(
+        "Query received - Length: %d chars",
+        len(question),
+        extra={"component": "RAG"},
+    )
+    logger.debug("Sending context to LLM", extra={"component": "Generator"})
+    started = time.perf_counter()
     produced_any = False
     for chunk in chain.stream(
         {"input": question},
@@ -53,6 +60,10 @@ def stream_rag_answer(chain, question: str, session_id: str, context_sink=None):
             produced_any = True
             yield chunk.content
     if produced_any:
-        logger.info("Answer generated")
+        logger.info(
+            "Answer generated successfully - Latency: %.2fs",
+            time.perf_counter() - started,
+            extra={"component": "Generator"},
+        )
     else:
-        logger.warning("LLM stream produced no answer content")
+        logger.warning("LLM stream produced no answer content", extra={"component": "Generator"})

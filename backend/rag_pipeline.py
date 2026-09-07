@@ -72,9 +72,10 @@ class HybridRerankRetriever(BaseRetriever):
                     },
                 )
             )
-        logger.info(
+        logger.debug(
             "Production hybrid_rerank retriever returned %d document(s)",
             len(documents),
+            extra={"component": "Retriever"},
         )
         return documents
 
@@ -138,7 +139,7 @@ def build_conversational_rag_chain(
     histories: dict,
     model_name: str = DEFAULT_MODEL,
 ):
-    logger.info("Building conversational RAG chain")
+    logger.debug("Building conversational RAG chain", extra={"component": "RAG"})
     llm = get_llm(api_key, model_name)
 
     # PRODUCTION RETRIEVAL: BGE dense + BM25 -> RRF -> cross-encoder -> Top-K.

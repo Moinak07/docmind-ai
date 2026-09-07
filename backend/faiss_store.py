@@ -41,6 +41,7 @@ from backend.retriever import (
     PDF_DIR,
     SUPPORTED_EXTENSIONS,
     build_vectorstore,
+    configure_session_storage as configure_retriever_session_storage,
     embeddings as default_embeddings,
     get_saved_pdf_names,
     load_documents_from_saved_pdfs,
@@ -59,6 +60,13 @@ MANIFEST_PATH = INDEX_DIR / "manifest.json"
 MANIFEST_VERSION = 1
 
 _HASH_CHUNK_BYTES = 1 << 20  # read files in 1 MiB blocks when hashing
+
+
+def configure_session_storage(session_id: str) -> None:
+    """Use the active session's document, index, and manifest directories."""
+    global DATA_DIR, PDF_DIR, INDEX_DIR, MANIFEST_PATH
+    DATA_DIR, PDF_DIR, INDEX_DIR = configure_retriever_session_storage(session_id)
+    MANIFEST_PATH = INDEX_DIR / "manifest.json"
 
 
 def _hash_file(path: Path) -> str:
@@ -105,7 +113,10 @@ def _read_manifest() -> dict | None:
             data = json.load(handle)
     except (OSError, ValueError):
         # unreadable file or invalid JSON -> treat as no manifest (rebuild)
-        logger.warning("FAISS manifest unreadable or invalid; will rebuild index")
+        logger.warning(
+            "FAISS manifest unreadable or invalid; will rebuild index",
+            extra={"component": "Indexer"},
+        )
         return None
     if not isinstance(data, dict):
         return None
@@ -149,7 +160,7 @@ def save_vectorstore(vectorstore: FAISS, manifest: dict) -> None:
     INDEX_DIR.mkdir(parents=True, exist_ok=True)
     vectorstore.save_local(str(INDEX_DIR), index_name=FAISS_INDEX_NAME)
     _write_manifest(manifest)
-    logger.info("Saved FAISS index to %s", INDEX_DIR)
+    logger.debug("Saved FAISS index to %s", INDEX_DIR, extra={"component": "Indexer"})
 
 
 def load_vectorstore(embeddings=default_embeddings) -> FAISS | None:
@@ -172,7 +183,10 @@ def load_vectorstore(embeddings=default_embeddings) -> FAISS | None:
         )
     except Exception:
         # corrupted / partially written / incompatible pickle -> rebuild
-        logger.warning("Persisted FAISS index could not be loaded; will rebuild")
+        logger.warning(
+            "Persisted FAISS index could not be loaded; will rebuild",
+            extra={"component": "Indexer"},
+        )
         return None
 
 
@@ -194,20 +208,32 @@ def get_or_build_vectorstore(
     The caller is responsible for only invoking this when there is at least one
     document to index; ``build_vectorstore`` requires a non-empty corpus.
     """
-    logger.info("Checking persistent FAISS index")
+    logger.debug("Checking persistent FAISS index", extra={"component": "Indexer"})
     current = build_manifest(embedding_model)
     saved = _read_manifest()
 
     if manifest_matches(saved, current):
-        logger.info("Corpus unchanged; loading existing FAISS index")
+        logger.info(
+            "Existing FAISS index loaded - corpus unchanged",
+            extra={"component": "Indexer"},
+        )
         vectorstore = load_vectorstore(embeddings)
         if vectorstore is not None:
-            logger.info("Loaded existing FAISS index (no embeddings recomputed)")
+            logger.debug(
+                "Loaded existing FAISS index (no embeddings recomputed)",
+                extra={"component": "Indexer"},
+            )
             return vectorstore, False
         # manifest was valid but the index files are missing/corrupt -> rebuild
-        logger.warning("Manifest matched but index missing/corrupt; rebuilding")
+        logger.warning(
+            "Manifest matched but index missing/corrupt; rebuilding",
+            extra={"component": "Indexer"},
+        )
     else:
-        logger.info("Corpus or config changed; rebuilding FAISS index")
+        logger.debug(
+            "Corpus or config changed; rebuilding FAISS index",
+            extra={"component": "Indexer"},
+        )
 
     documents = load_documents_from_saved_pdfs()
     vectorstore = build_vectorstore(documents)

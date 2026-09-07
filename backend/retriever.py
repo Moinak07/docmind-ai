@@ -1,4 +1,6 @@
 import os
+import time
+import hashlib
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -7,16 +9,31 @@ from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain_community.vectorstores import FAISS
 
 from backend.chunking import CHUNK_OVERLAP, CHUNK_SIZE, split_documents  # noqa: F401
-from backend.logging_config import get_logger
+from backend.logging_config import get_logger, sanitize_log_value
 
 logger = get_logger(__name__)
 
 load_dotenv()
 
-DATA_DIR = Path("data")
+BASE_DATA_DIR = Path("data")
+DATA_DIR = BASE_DATA_DIR
 PDF_DIR = DATA_DIR / "pdfs"
 PDF_DIR.mkdir(parents=True, exist_ok=True)
 SUPPORTED_EXTENSIONS = {".pdf", ".docx", ".txt", ".csv"}
+
+
+def configure_session_storage(session_id: str) -> tuple[Path, Path, Path]:
+    """Point document storage at the active session's isolated directories."""
+    session_key = hashlib.sha256(session_id.encode("utf-8")).hexdigest()[:32]
+    session_dir = BASE_DATA_DIR / "sessions" / session_key
+    pdf_dir = session_dir / "pdfs"
+    index_dir = session_dir / "faiss_index"
+
+    global DATA_DIR, PDF_DIR
+    DATA_DIR = session_dir
+    PDF_DIR = pdf_dir
+    PDF_DIR.mkdir(parents=True, exist_ok=True)
+    return DATA_DIR, PDF_DIR, index_dir
 
 # --- Constants ---
 # CHUNK_SIZE / CHUNK_OVERLAP are defined in backend.chunking and re-exported
@@ -40,7 +57,6 @@ if hf_token:
 # normalize_embeddings=True is the configuration BGE expects; combined with the
 # FAISS L2 index already in use it yields cosine-equivalent ranking without any
 # change to the FAISS/retrieval logic itself.
-logger.info("Loading embedding model: %s", EMBEDDING_MODEL)
 embeddings = HuggingFaceBgeEmbeddings(
     model_name=EMBEDDING_MODEL,
     encode_kwargs={"normalize_embeddings": True},
@@ -52,11 +68,32 @@ def save_uploaded_pdfs(uploaded_files) -> list[str]:
     for uploaded_file in uploaded_files:
         safe_name = Path(uploaded_file.name).name
         dest = PDF_DIR / safe_name
-        with open(dest, "wb") as file:
-            file.write(uploaded_file.getvalue())
+        try:
+            contents = uploaded_file.getvalue()
+            if dest.exists() and dest.read_bytes() == contents:
+                continue
+            with open(dest, "wb") as file:
+                file.write(contents)
+        except OSError as exc:
+            logger.error(
+                "Document upload failed: %s",
+                type(exc).__name__,
+                extra={"component": "Upload"},
+            )
+            logger.debug(
+                "Document upload failure details - Exception: %s",
+                type(exc).__name__,
+                extra={"component": "Upload"},
+            )
+            raise
         saved.append(safe_name)
         # Log the filename only -- never the file contents.
-        logger.info("Document uploaded: %s", safe_name)
+        logger.info(
+            "'%s' uploaded successfully - Size: %.1fKB",
+            sanitize_log_value(safe_name),
+            len(contents) / 1024,
+            extra={"component": "Upload"},
+        )
     return saved
 
 
@@ -64,9 +101,17 @@ def delete_saved_pdf(filename: str) -> bool:
     target = PDF_DIR / Path(filename).name
     if target.exists():
         target.unlink()
-        logger.info("Document removed: %s", target.name)
+        logger.info(
+            "Document removed: '%s'",
+            sanitize_log_value(target.name),
+            extra={"component": "Upload"},
+        )
         return True
-    logger.warning("Delete requested for missing document: %s", target.name)
+    logger.warning(
+        "Delete requested for missing document: '%s'",
+        sanitize_log_value(target.name),
+        extra={"component": "Upload"},
+    )
     return False
 
 
@@ -111,7 +156,7 @@ def load_document(document_path: Path) -> list:
 
 def load_documents_from_saved_pdfs() -> list:
     """Load all supported documents. PDFs retain 1-indexed page numbers."""
-    logger.info("Loading documents")
+    logger.debug("Loading documents", extra={"component": "Indexer"})
     documents = []
     source_paths = sorted(
         path
@@ -120,17 +165,26 @@ def load_documents_from_saved_pdfs() -> list:
     )
     for document_path in source_paths:
         documents.extend(load_document(document_path))
-    logger.info("Loaded %d document section(s) from %d file(s)", len(documents), len(source_paths))
+    logger.debug(
+        "Loaded %d document section(s) from %d file(s)",
+        len(documents),
+        len(source_paths),
+        extra={"component": "Indexer"},
+    )
     return documents
 
 
 def build_vectorstore(documents: list) -> FAISS:
     """Chunk the loaded documents (see backend.chunking) and index them in FAISS."""
-    logger.info("Creating chunks")
+    logger.debug("Creating chunks", extra={"component": "Indexer"})
     splits = split_documents(documents)
-    logger.info("Created %d chunk(s); building FAISS index", len(splits))
+    logger.debug(
+        "Created %d chunk(s); building FAISS index",
+        len(splits),
+        extra={"component": "Indexer"},
+    )
     vectorstore = FAISS.from_documents(documents=splits, embedding=embeddings)
-    logger.info("FAISS index built (%d vectors)", len(splits))
+    logger.debug("FAISS index built (%d vectors)", len(splits), extra={"component": "Indexer"})
     return vectorstore
 
 

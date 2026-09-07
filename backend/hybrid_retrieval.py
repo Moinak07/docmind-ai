@@ -44,6 +44,7 @@ Design notes
 from __future__ import annotations
 
 import re
+import time
 from typing import Callable
 
 from langchain_community.vectorstores import FAISS
@@ -205,7 +206,11 @@ class HybridRetriever:
     @property
     def bm25(self) -> BM25Index:
         if self._bm25 is None:
-            logger.info("Building BM25 index over %d chunk(s)", len(self.chunks))
+            logger.debug(
+                "Building BM25 index over %d chunk(s)",
+                len(self.chunks),
+                extra={"component": "BM25"},
+            )
             self._bm25 = BM25Index(self.chunks)
         return self._bm25
 
@@ -233,11 +238,21 @@ class HybridRetriever:
             "hybrid"         dense + bm25 fused with RRF
             "hybrid_rerank"  fused pool reordered by the cross-encoder
         """
-        logger.info("Hybrid retrieval started (mode=%s, k=%d)", mode, k)
+        started = time.perf_counter()
+        logger.debug(
+            "Hybrid retrieval started (mode=%s, k=%d)",
+            mode,
+            k,
+            extra={"component": "Retriever"},
+        )
 
         if mode == "dense":
             indices = self._dense_ranked_indices(query, k)
-            logger.info("Dense retrieval completed (%d candidates)", len(indices))
+            logger.debug(
+                "Dense retrieval completed - Candidates: %d",
+                len(indices),
+                extra={"component": "Dense"},
+            )
             return [
                 _as_result(self.chunks[i], rank, 1.0 / rank)
                 for rank, i in enumerate(indices[:k], start=1)
@@ -245,7 +260,11 @@ class HybridRetriever:
 
         if mode == "bm25":
             indices = self._bm25_ranked_indices(query, k)
-            logger.info("BM25 retrieval completed (%d candidates)", len(indices))
+            logger.debug(
+                "BM25 retrieval completed - Candidates: %d",
+                len(indices),
+                extra={"component": "BM25"},
+            )
             return [
                 _as_result(self.chunks[i], rank, 1.0 / rank)
                 for rank, i in enumerate(indices[:k], start=1)
@@ -253,30 +272,59 @@ class HybridRetriever:
 
         if mode in ("hybrid", "hybrid_rerank"):
             dense_indices = self._dense_ranked_indices(query, LEG_K)
-            logger.info("Dense retrieval completed (%d candidates)", len(dense_indices))
+            logger.debug(
+                "Dense retrieval completed - Candidates: %d",
+                len(dense_indices),
+                extra={"component": "Dense"},
+            )
             bm25_indices = self._bm25_ranked_indices(query, LEG_K)
-            logger.info("BM25 retrieval completed (%d candidates)", len(bm25_indices))
+            logger.debug(
+                "BM25 retrieval completed - Candidates: %d",
+                len(bm25_indices),
+                extra={"component": "BM25"},
+            )
             fused = reciprocal_rank_fusion([dense_indices, bm25_indices])
-            logger.info("RRF fusion completed (%d fused candidates)", len(fused))
+            logger.debug(
+                "RRF fusion completed - Candidates: %d",
+                len(fused),
+                extra={"component": "RRF"},
+            )
 
             if mode == "hybrid":
                 results = [
                     _as_result(self.chunks[i], rank, score)
                     for rank, (i, score) in enumerate(fused[:k], start=1)
                 ]
-                logger.info("Hybrid retrieval returning %d chunk(s)", len(results))
+                logger.debug(
+                    "Hybrid retrieval returning %d chunk(s)",
+                    len(results),
+                    extra={"component": "Retriever"},
+                )
                 return results
 
             # hybrid_rerank: cross-encoder rescoring of ONLY the fused pool.
             pool_indices = [index for index, _ in fused[:POOL_SIZE]]
-            logger.info("Cross-encoder reranking %d pooled candidate(s)", len(pool_indices))
+            logger.debug(
+                "Cross-encoder reranking - Candidates: %d",
+                len(pool_indices),
+                extra={"component": "Reranker"},
+            )
             reranked = self._rerank(query, pool_indices)
-            logger.info("Cross-encoder reranking completed")
+            logger.debug(
+                "Cross-encoder reranking completed - Candidates: %d",
+                len(reranked),
+                extra={"component": "Reranker"},
+            )
             results = [
                 _as_result(self.chunks[i], rank, score)
                 for rank, (i, score) in enumerate(reranked[:k], start=1)
             ]
-            logger.info("Hybrid+rerank returning %d chunk(s)", len(results))
+            logger.info(
+                "Retrieval completed successfully - Chunks: %d, Latency: %dms",
+                len(results),
+                round((time.perf_counter() - started) * 1000),
+                extra={"component": "Retriever"},
+            )
             return results
 
         raise ValueError(
@@ -295,7 +343,11 @@ class HybridRetriever:
         if self._cross_encoder is None:
             from sentence_transformers import CrossEncoder
 
-            logger.info("Loading cross-encoder model: %s", self.cross_encoder_model)
+            logger.debug(
+                "Loading cross-encoder model: %s",
+                self.cross_encoder_model,
+                extra={"component": "Reranker"},
+            )
             self._cross_encoder = CrossEncoder(self.cross_encoder_model)
 
         pairs = [[query, self.chunks[i].page_content] for i in pool_indices]

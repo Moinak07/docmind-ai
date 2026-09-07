@@ -23,15 +23,62 @@ from __future__ import annotations
 import logging
 import os
 import sys
+from contextvars import ContextVar
+from pathlib import Path
+from logging.handlers import RotatingFileHandler
+import re
 
 # All app loggers live under this namespace ("docmind.<module>") so one config
 # controls them and library logging is left untouched.
 ROOT_LOGGER_NAME = "docmind"
 
-# Format includes a timestamp and the level, e.g.:
-#   2026-09-05 18:20:01 [INFO] docmind.retriever: Loading documents
-LOG_FORMAT = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+# One format is used by both console and rotating-file handlers.
+LOG_FORMAT = "[%(asctime)s,%(msecs)03d] [%(levelname)s] [Session: %(session_id)s] [%(component)s] - %(message)s"
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+LOG_DIR = Path("logs")
+LOG_FILE = LOG_DIR / "docmind.log"
+MAX_BYTES = 5 * 1024 * 1024
+BACKUP_COUNT = 3
+_CONFIG_VERSION = 2
+
+_session_id: ContextVar[str] = ContextVar("docmind_session_id", default="default_session")
+_SAFE_VALUE_RE = re.compile(r"[^\w .:@/+\-]", re.ASCII)
+
+
+def sanitize_log_value(value: object, fallback: str = "unknown", limit: int = 160) -> str:
+  """Keep user-controlled values single-line and bounded in log output."""
+  text = str(value).replace("\r", " ").replace("\n", " ").strip()
+  text = _SAFE_VALUE_RE.sub("_", text)
+  return (text or fallback)[:limit]
+
+
+class _ContextFilter(logging.Filter):
+  """Add request context without requiring every call site to pass it."""
+
+  def filter(self, record: logging.LogRecord) -> bool:
+    record.session_id = _session_id.get()
+    if not hasattr(record, "component"):
+      component_names = {
+        "app": "App",
+        "citations": "Citations",
+        "faiss_store": "Indexer",
+        "generator": "Generator",
+        "hybrid_retrieval": "Retriever",
+        "rag_pipeline": "RAG",
+        "retriever": "Retriever",
+      }
+      module = record.name.rsplit(".", 1)[-1]
+      record.component = component_names.get(module, module.title())
+    return True
+
+
+def set_session_id(session_id: str) -> None:
+  """Set the existing application session ID for logs in this execution."""
+  _session_id.set(sanitize_log_value(session_id, fallback="default_session", limit=80))
+
+
+def get_session_id() -> str:
+  return _session_id.get()
 
 # Level can be overridden with DOCMIND_LOG_LEVEL=DEBUG (etc.) without code
 # changes; defaults to INFO for normal application flow.
@@ -49,15 +96,41 @@ def configure_logging(level: str | int | None = None) -> logging.Logger:
     resolved_level = level if level is not None else DEFAULT_LEVEL
     logger.setLevel(resolved_level)
 
-    # Idempotency guard: only attach a handler the first time.
-    if not getattr(logger, "_docmind_configured", False):
-        handler = logging.StreamHandler(stream=sys.stdout)
-        handler.setFormatter(logging.Formatter(fmt=LOG_FORMAT, datefmt=DATE_FORMAT))
-        logger.addHandler(handler)
-        # Don't also bubble up to the root logger's handlers (avoids double lines
-        # if the host application configured the root logger too).
-        logger.propagate = False
-        logger._docmind_configured = True  # type: ignore[attr-defined]
+    if getattr(logger, "_docmind_config_version", None) != _CONFIG_VERSION:
+      # Remove handlers from an older configuration as well as from a first
+      # configuration, preventing mixed formats after a Streamlit reload.
+      for handler in list(logger.handlers):
+        logger.removeHandler(handler)
+        handler.close()
+
+      formatter = logging.Formatter(fmt=LOG_FORMAT, datefmt=DATE_FORMAT)
+      context_filter = _ContextFilter()
+
+      console_handler = logging.StreamHandler(stream=sys.stdout)
+      console_handler.setFormatter(formatter)
+      console_handler.addFilter(context_filter)
+      logger.addHandler(console_handler)
+
+      try:
+        LOG_DIR.mkdir(parents=True, exist_ok=True)
+        file_handler = RotatingFileHandler(
+          LOG_FILE,
+          maxBytes=MAX_BYTES,
+          backupCount=BACKUP_COUNT,
+          encoding="utf-8",
+        )
+      except OSError:
+        # Console logging remains available if local file logging cannot be
+        # initialized; logging must never prevent the app from starting.
+        file_handler = None
+      if file_handler is not None:
+        file_handler.setFormatter(formatter)
+        file_handler.addFilter(context_filter)
+        logger.addHandler(file_handler)
+
+      # Don't also bubble up to the root logger's handlers.
+      logger.propagate = False
+      logger._docmind_config_version = _CONFIG_VERSION  # type: ignore[attr-defined]
 
     return logger
 

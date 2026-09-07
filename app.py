@@ -1,8 +1,9 @@
 import streamlit as st
+import time
 
-from backend.logging_config import get_logger
+from backend.logging_config import get_logger, set_session_id
 from backend.citations import build_citation_block, is_insufficient_answer
-from backend.faiss_store import get_or_build_vectorstore
+from backend.faiss_store import build_manifest, configure_session_storage, get_or_build_vectorstore
 from backend.rag_pipeline import (
     answer_upload_status_question,
     build_conversational_rag_chain,
@@ -530,10 +531,6 @@ button[kind="header"],
 """, unsafe_allow_html=True)
 
 # ── Session state init ─────────────────────────────────────────────────────────
-if "app_started_logged" not in st.session_state:
-    # Log the startup banner once per session, not on every Streamlit rerun.
-    logger.info("DOCMIND-AI started")
-    st.session_state.app_started_logged = True
 if "store" not in st.session_state:
     st.session_state.store = load_saved_histories()
 if "vectorstore" not in st.session_state:
@@ -542,6 +539,8 @@ if "chain" not in st.session_state:
     st.session_state.chain = None
 if "loaded_pdf_names" not in st.session_state:
     st.session_state.loaded_pdf_names = set()
+if "loaded_manifest" not in st.session_state:
+    st.session_state.loaded_manifest = None
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 if "active_api_key" not in st.session_state:
@@ -550,6 +549,13 @@ if "last_retrieved_chunks" not in st.session_state:
     st.session_state.last_retrieved_chunks = []
 if "active_session_id" not in st.session_state:
     st.session_state.active_session_id = "default_session"
+set_session_id(st.session_state.active_session_id)
+configure_session_storage(st.session_state.active_session_id)
+if "app_started_logged" not in st.session_state:
+    # Log the startup banner once per session, not on every Streamlit rerun.
+    logger.info("DOCMIND-AI started successfully", extra={"component": "App"})
+    logger.info("User session initialized successfully", extra={"component": "Session"})
+    st.session_state.app_started_logged = True
 if not st.session_state.chat_history:
     active_history = get_session_history(
         st.session_state.store,
@@ -585,7 +591,8 @@ with st.sidebar:
     if st.button("Use API key", type="primary", use_container_width=True):
         st.session_state.active_api_key = api_key.strip()
         st.session_state.chain = None
-        st.session_state.loaded_pdf_names = set()
+        if st.session_state.active_api_key:
+            logger.info("API key configured successfully", extra={"component": "Config"})
         st.toast("API key applied.")
 
     api_key = st.session_state.active_api_key
@@ -601,12 +608,19 @@ with st.sidebar:
     )
     if st.button("Use session", type="primary", use_container_width=True):
         st.session_state.active_session_id = session_id.strip() or "default_session"
+        set_session_id(st.session_state.active_session_id)
+        configure_session_storage(st.session_state.active_session_id)
+        st.session_state.vectorstore = None
+        st.session_state.chain = None
+        st.session_state.loaded_pdf_names = set()
+        st.session_state.loaded_manifest = None
         active_history = get_session_history(
             st.session_state.store,
             st.session_state.active_session_id,
         )
         st.session_state.chat_history = history_to_chat_display(active_history)
         st.session_state.last_retrieved_chunks = []
+        logger.info("User session initialized successfully", extra={"component": "Session"})
         st.toast(f"Session applied: {st.session_state.active_session_id}")
 
     session_id = st.session_state.active_session_id
@@ -618,6 +632,7 @@ with st.sidebar:
         "Drop documents here or browse",
         type=["pdf", "docx", "txt", "csv"],
         accept_multiple_files=True,
+        key=f"uploaded_files_{session_id}",
         label_visibility="visible",
     )
     if uploaded_files:
@@ -627,6 +642,7 @@ with st.sidebar:
             st.session_state.vectorstore = None
             st.session_state.chain = None
             st.session_state.loaded_pdf_names = set()
+            st.session_state.loaded_manifest = None
             st.toast(f"{len(newly_saved)} document(s) uploaded!", icon="✅")
 
     saved_pdfs = get_saved_pdf_names()
@@ -653,6 +669,8 @@ with st.sidebar:
                     st.session_state.vectorstore = None
                     st.session_state.chain = None
                     st.session_state.loaded_pdf_names = set()
+                    st.session_state.loaded_manifest = None
+                    st.session_state.pop(f"uploaded_files_{session_id}", None)
                     st.rerun()
 
     st.markdown('<hr class="sb-divider">', unsafe_allow_html=True)
@@ -698,10 +716,16 @@ if not api_key:
 
 # ── Build / rebuild vectorstore only when documents change ───────────────────
 current_pdf_names = set(get_saved_pdf_names())
-pdfs_changed = current_pdf_names != st.session_state.loaded_pdf_names
+current_manifest = build_manifest()
+documents_changed = (
+    current_pdf_names != st.session_state.loaded_pdf_names
+    or current_manifest != st.session_state.loaded_manifest
+)
 
-if current_pdf_names and pdfs_changed:
+if current_pdf_names and documents_changed:
     with st.spinner("Indexing your documents…"):
+        indexing_started = time.perf_counter()
+        logger.info("Indexing started", extra={"component": "Indexer"})
         try:
             # Persistent FAISS: reuse the on-disk index when the corpus and
             # embedding model still match its manifest (no embeddings recomputed);
@@ -714,14 +738,37 @@ if current_pdf_names and pdfs_changed:
                 st.session_state.store,
             )
             st.session_state.loaded_pdf_names = current_pdf_names
+            st.session_state.loaded_manifest = current_manifest
+            indexing_seconds = time.perf_counter() - indexing_started
+            logger.info(
+                "Indexing completed successfully - Time: %.2fs",
+                indexing_seconds,
+                extra={"component": "Indexer"},
+            )
             if rebuilt:
                 st.success(f"✦  {get_saved_pdf_count()} document(s) indexed and ready.")
             else:
                 st.success(f"✦  Loaded saved index for {get_saved_pdf_count()} document(s).")
         except Exception as exc:
-            logger.error("Failed to index documents: %s", exc, exc_info=True)
+            logger.error(
+                "Indexing failed: %s",
+                type(exc).__name__,
+                extra={"component": "Indexer"},
+            )
+            logger.debug(
+                "Indexing failure details - Exception: %s",
+                type(exc).__name__,
+                extra={"component": "Indexer"},
+            )
             st.error(f"Failed to index documents: {exc}")
             st.stop()
+
+elif current_pdf_names and st.session_state.chain is None:
+    st.session_state.chain = build_conversational_rag_chain(
+        api_key,
+        st.session_state.vectorstore,
+        st.session_state.store,
+    )
 
 # ── Guard: no documents ──────────────────────────────────────────────────────
 if not current_pdf_names:
@@ -856,7 +903,16 @@ if ask_clicked:
             st.session_state.chat_history.append({"role": "assistant", "content": answer})
             save_histories(st.session_state.store)
         except Exception as exc:
-            logger.error("Error while answering query: %s", exc, exc_info=True)
+            logger.error(
+                "Answer generation failed: %s",
+                type(exc).__name__,
+                extra={"component": "Generator"},
+            )
+            logger.debug(
+                "Answer generation failure details - Exception: %s",
+                type(exc).__name__,
+                extra={"component": "Generator"},
+            )
             st.session_state.chat_history.append(
                 {"role": "assistant", "content": f"⚠️ Something went wrong: {exc}"}
             )
