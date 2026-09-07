@@ -46,10 +46,10 @@ Hit Rate@5 remained 50% across all tested strategies. MRR improved from 0.2917 w
 flowchart TD
     U[User query] --> A[Streamlit app.py]
     A --> H[History-aware LangChain retriever]
-    H --> R[HybridRerankRetriever]
-    R --> D[BGE embeddings + persistent FAISS]
+    H --> R[Hybrid Retrieval]
+    R --> D[BGE/FAISS dense retrieval]
     R --> B[BM25 sparse retrieval]
-    D --> F[Reciprocal Rank Fusion]
+    D --> F[RRF rank fusion]
     B --> F
     F --> P[20-item candidate pool]
     P --> X[Cross-Encoder reranker<br/>ms-marco-MiniLM-L-6-v2]
