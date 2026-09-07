@@ -118,7 +118,7 @@ Uploaded files and persistent FAISS state are stored beneath a hashed session di
 - Session-keyed upload widgets prevent uploader state from crossing sessions.
 - Identical uploaded bytes are skipped on reruns.
 - Manifest and file hashes prevent unnecessary re-indexing when documents are unchanged.
-- Chat history remains managed separately by session ID in the existing history store.
+- Chat history remains managed separately by session ID in `data/chat_histories.json`.
 
 ### Evaluation
 
@@ -127,8 +127,9 @@ Uploaded files and persistent FAISS state are stored beneath a hashed session di
 - Comparison of BGE, BM25, Hybrid, and Hybrid + Cross-Encoder retrieval.
 - PDF page and CSV row ground-truth checks.
 
-### Logging
-
+    - Session-specific document storage under `data/sessions/<sha256(session_id)[:32]>/pdfs/`.
+    - Session-specific FAISS files under `data/sessions/<sha256(session_id)[:32]>/faiss_index/`.
+    - Session-specific manifests at `data/sessions/<sha256(session_id)[:32]>/faiss_index/manifest.json`.
 - Terminal logging through the centralized `docmind` logger.
 - Rotating local file logging at `logs/docmind.log`.
 - Existing application session IDs in log context.
@@ -219,7 +220,7 @@ GROQ_API_KEY=your_groq_api_key_here
 HF_TOKEN=your_huggingface_token_here
 ```
 
-`GROQ_API_KEY` is required for generation. `HF_TOKEN` may be useful when the Hugging Face environment requires authentication. Do not commit `.env` or expose either credential.
+`GROQ_API_KEY` is required for generation. `HF_TOKEN` is optional: the current code forwards it to the Hugging Face environment when provided, but does not require it to configure the embedding model. Do not commit `.env` or expose either credential.
 
 ### Run the application
 
