@@ -25,19 +25,6 @@ DocMind AI is a Streamlit-based Retrieval-Augmented Generation (RAG) application
 
 The system combines dense and sparse retrieval, rank-based fusion, and cross-encoder reranking before generation. Answers are streamed to the UI, while source citations are generated programmatically from the metadata of the documents actually supplied to the model, helping reduce unsupported answers and fabricated references.
 
-## Key Results
-
-The latest verified retrieval evaluation reports the following results over **6 test questions**:
-
-| Strategy | Hit Rate@5 | MRR@5 |
-|---|---:|---:|
-| BGE | 0.5000 | 0.2917 |
-| BM25 | 0.5000 | 0.3667 |
-| Hybrid | 0.5000 | 0.3750 |
-| Hybrid + Cross-Encoder Reranker | 0.5000 | 0.5000 |
-
-Hit Rate@5 remained 50% across all tested strategies. MRR improved from 0.2917 with BGE to 0.5000 with Hybrid + Cross-Encoder Reranking, meaning reranking improved the position of relevant results without increasing top-5 retrieval coverage.
-
 ## Architecture
 
 ### Query-Time Architecture
